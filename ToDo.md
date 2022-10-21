@@ -1,0 +1,3 @@
+-Impliment Async try and catch
+-reset password 
+-Logging to file

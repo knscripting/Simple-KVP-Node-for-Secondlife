@@ -1,0 +1,29 @@
+version: '2'
+
+# Define the services/containers to be run
+services:
+  mmkvp: #name of your service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" #specify ports forwarding
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules  
+    container_name: mmkvp-node
+    restart: unless-stopped
+    command: npm start
+    links:
+      - mongodb # link this service to the database service    
+    depends_on:
+      - mongodb
+
+  mongodb: # name of the service
+    image: mongo # specify image to build container from
+    container_name: mmkvp-mongodb
+    volumes:
+      - ./mongoData/data:/data/db 
+    ports:
+      - "27017:27017"
+    restart: unless-stopped 
