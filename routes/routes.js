@@ -5,7 +5,7 @@ const router = express.Router();
 
 
 router.get('/', function(req, res){
-    res.json({status: "online", message: "mmkvp ready" })
+    res.json({status: "ONLINE"})
 })
 
 /*
@@ -14,7 +14,7 @@ We record the SL header information as it could be
 handy with debugging, and other functions
 */
 
-router.put('/update', async (req, res) => {
+router.put('/mmWrite', async (req, res) => {
     try {
         const updatedData = {
             mmKey: req.body.mmKey,
@@ -41,8 +41,23 @@ router.put('/update', async (req, res) => {
     }
 })
 
+
+//Get by ID Method
+router.post('/mmRead', async (req, res) => {
+    try {
+        var id = {mmKey: req.body.mmKey};
+        console.log("Reading:",id);
+        const data = await Model.findOne(id);
+        res.json(data)
+    }
+    catch (error) {
+        console.log("No Key");
+        res.status(500).json({ status: "failed", message: error.message })
+    }
+})
+
 //Post Method Not needed
-router.post('/create', async (req, res) => {
+router.post('/mmNew', async (req, res) => {
     const data = new Model({
         mmKey: req.body.mmKey,
         mmValue: req.body.mmValue
@@ -57,8 +72,20 @@ router.post('/create', async (req, res) => {
     }
 })
 
-//Get all Method
+//Delete by ID Method
+router.post('/mmDelete', async (req, res) => {
+    try {
+        const id = {mmKey: req.body.mmKey.toString()};
+        const data = await Model.findOneAndDelete(id)
+        res.send(`Document with ${data.mmKey} deleted`)
+    }
+    catch (error) {
+        res.status(400).json({ status: "failed", message: error.message })
+    }
+})
 
+/* No Need for this Method at this time
+//Get all Method
 router.get('/getAll', async (req, res) => {
     try {
         const data = await Model.find();
@@ -69,31 +96,7 @@ router.get('/getAll', async (req, res) => {
     }
 })
 
-//Get by ID Method
-router.post('/getOne', async (req, res) => {
-    try {
-        var id = {mmKey: req.body.mmKey};
-        console.log("Reading:",id);
-        const data = await Model.findOne(id);
-        res.json(data)
-    }
-    catch (error) {
-        console.log("No Key");
-        res.status(500).json({ status: "failed", message: error.message })
-    }
-})
-
-//Delete by ID Method
-router.post('/delete', async (req, res) => {
-    try {
-        const id = {mmKey: req.body.mmKey.toString()};
-        const data = await Model.findOneAndDelete(id)
-        res.send(`Document with ${data.mmKey} has been deleted..`)
-    }
-    catch (error) {
-        res.status(400).json({ status: "failed", message: error.message })
-    }
-})
+*/
 
 module.exports = router;
 
