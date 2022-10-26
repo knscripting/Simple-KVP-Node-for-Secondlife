@@ -3,8 +3,8 @@
 
 #define nodeHOST "http://YOUR.HOST.HERE:PORT/mmkvp/"
 // !!! Set these to something "secure" as of version 1 this is the best I have for in SL script "security" 
-#define chanNumRequest 808680
-#define chanNumResponse 808681
+#define chanNumRequest 8675309
+#define chanNumResponse 8675310
 
 // END SET VALUES
 
