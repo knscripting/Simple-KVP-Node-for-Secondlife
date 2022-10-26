@@ -9,8 +9,8 @@
 #define myKeyHash (string)llGetOwner()+"-Project-Test-API" 
 //Channels to prevent a loop on llMessageLinked and basic Security
 
-#define chanNumRequest 808680 
-#define chanNumResponse 808681
+#define chanNumRequest 8675309
+#define chanNumResponse 8675310
 
 //!!!EndSet 
 
