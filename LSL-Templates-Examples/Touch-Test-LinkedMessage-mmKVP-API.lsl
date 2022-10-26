@@ -13,7 +13,6 @@
 #define chanNumResponse 8675310
 
 //!!!EndSet 
-
 /*   
 
 Testing mmKVP API 
