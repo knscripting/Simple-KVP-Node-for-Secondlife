@@ -5,10 +5,9 @@
 //the user's/thing's OwnerKey or CreatorKey Plus a string Identifier for the Project, 
 //You can even llSHA256String(some+unique+bunch+of+strings) for futher uniqueness. 
 //Whatever you want to do to make a key unique in your project's Database.  
- 
-#define myKeyHash (string)llGetOwner()+"-Project-Test-API" 
-//Channels to prevent a loop on llMessageLinked and basic Security
+ #define myKeyHash (string)llGetOwner()+"-Project-Test-API" 
 
+// !!! Set these to something "secure" as of version 1 this is the best I have for in SL script "security" 
 #define chanNumRequest 8675309
 #define chanNumResponse 8675310
 

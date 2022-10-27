@@ -1,12 +1,8 @@
+const { application } = require('express');
 const express = require('express');
 const Model = require('../models/model');
 const router = express.Router();
 
-
-
-router.get('/', function(req, res){
-    res.json({status: "ONLINE"})
-})
 
 /*
 Upsert is enabled, if record doesn't exist, create it
@@ -31,10 +27,9 @@ router.put('/mmWrite', async (req, res) => {
         const result = await Model.findOneAndUpdate(
             id, updatedData, options
         )
-        //res.send(result) //working
         const sendMe = {mmValue: result.mmValue};
         res.send(sendMe);
-        console.log("Writing:", id);
+        console.log("Writing:", id );
     }
     catch (error) {
         res.status(500).json({ status: "ERROR", message: error.message })

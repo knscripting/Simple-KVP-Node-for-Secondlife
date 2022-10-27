@@ -1,12 +1,36 @@
-// SET THESE VALUES!!
+//!!!!! Required Settings
 // http or https whatever you setup on your host
 
-#define nodeHOST "http://YOUR.HOST.HERE:PORT/mmkvp/"
-// !!! Set these to something "secure" as of version 1 this is the best I have for in SL script "security" 
+//apiKey MUST match what is .env on your mmKVP node
+#define apiKey ThisIsMyAPIKey 
+/*
+The URL of your mmkVP node. 
+https is not supported out of the box. Consider enabling a simple nginx https proxy in produciton
+Using amazons EC2 free tier to a mongodb.com free tier is surprisingly quick. 
+*/
+#define nodeHOST "http://myNodeIPorFQDN.mine:PORT/mmkvp/"
+
+/*
+Key Generator hash. 
+A Unique Key for the Database. I recommend something like:
+           (string)llGetOwner() + "#" + "Reference Type" + "#"ProjectName"
+           Ex:
+           123-123-12312312312-1231231#Player#My_First_KVP_HUD
+           or
+           231.137-35132423423-1774564#Monster#My_First_KVP_HUD
+           
+           That's completely optional and should be set to your needs
+*/
+#define myKeyHash (string)llGetOwner()+"-MyProject" 
+/*
+llLinkMessage "channels" if used
+!!! change these and keep them secret, currently the only security in place to prevent
+"unauthorized" access to the contents of your DB. 
+*/
 #define chanNumRequest 8675309
 #define chanNumResponse 8675310
 
-// END SET VALUES
+//!!!!! END SET VALUES
 
 
 /*   
@@ -64,11 +88,11 @@ ToDo:
 
 //Macro Function that generates and sends the http_request for a WRITE
 #define mmWrite(mmKey, mmValue) \
-    http_request_id=llHTTPRequest(nodeHOST+"mmWrite/",headerPUT,"mmKey="+mmKey+"&mmValue="+mmValue) 
+    http_request_id=llHTTPRequest(nodeHOST+"mmWrite/",headerPUT,"mmKey="+mmKey+"&mmValue="+mmValue+"&apiKey="+apiKey) 
 
 //Macro Function that generates and sends the http_request for a READ 
 #define mmRead(mmKey) \
-    http_request_id=llHTTPRequest(nodeHOST+"mmRead/",headerPOST,"mmKey="+mmKey)
+    http_request_id=llHTTPRequest(nodeHOST+"mmRead/",headerPOST,"mmKey="+mmKey+"&apiKey="+apiKey)
 
 key http_request_id;
 integer routeFlag ; 

@@ -1,18 +1,22 @@
 /* mmKVP inline configuration https://github.com/knscripting/Simple-KVP-Node-for-Secondlife
 
 This script does nothing at the moment, it's a template so you can make your own
-Unlike the llLinkMessage version of the API, this is a single stand alone method.
+Unlike the llLinkMessage version of the API, this is for a single script stand-alone-method.
 
 Consider this a template to build a functional script from.
 
+*/
 
 // !!!!!! Required Settings
 
+//apiKey MUST match what is .env on your mmKVP node
+#define apiKey ThisIsMyAPIKey 
+/*
  The URL of your mmkVP node. 
  https is not supported out of the box. Consider enabling a simple nginx https proxy in produciton
  Using amazons EC2 free tier to a mongodb.com free tier is surprisingly quick. 
 */
-#define nodeHOST "http://mynodelittlenode.com:8080/mmkvp/"
+#define nodeHOST "http://myNodeIPorFQDN.mine:PORT/mmkvp/"
 
 /*
  Key Generator hash. 
@@ -25,7 +29,6 @@ Consider this a template to build a functional script from.
             
             That's completely optional and should be set to your needs
 */
-
 #define myKeyHash (string)llGetOwner()+"-MyProject" 
 
 
@@ -56,16 +59,16 @@ llLinkMessage "channels" if used
 //Macro Function that generates and sends the http_request for a WRITE
 #define mmWrite(mmKey, mmValue) \
     methodFlag=WRITE; \
-    http_request_id=llHTTPRequest(nodeHOST+"mmWrite/",headerPUT,"mmKey="+mmKey+"&mmValue="+mmValue) 
+    http_request_id=llHTTPRequest(nodeHOST+"mmWrite/",headerPUT,"mmKey="+mmKey+"&mmValue="+mmValue+"&apiKey="+apiKey) 
 
 //Macro Function that generates and sends the http_request for a READ
 #define mmRead(mmKey) \
     methodFlag=READ ;\
-    http_request_id=llHTTPRequest(nodeHOST+"mmRead/",headerPOST,"mmKey="+mmKey)
+    http_request_id=llHTTPRequest(nodeHOST+"mmRead/",headerPOST,"mmKey="+mmKey+"&apiKey="+apiKey)
 
 key http_request_id; 
 integer methodFlag ; //Used to parse requests and responses
-integer responseFlag =0 ; //how to process the query's associated response
+integer responseFlag=0 ; //how to process the query's associated response
 string myKey = "" ; //what our unique Key will be
 string myValue = ""; //The value that will be stored and referenced by myKey Or the Default Value
 string myResponse = ""; //The string returned from the Query via link_message below
