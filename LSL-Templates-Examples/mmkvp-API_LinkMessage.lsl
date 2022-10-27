@@ -2,7 +2,7 @@
 // http or https whatever you setup on your host
 
 //apiKey MUST match what is .env on your mmKVP node
-#define apiKey ThisIsMyAPIKey 
+#define apiKey "ThisIsMyAPIKey" 
 /*
 The URL of your mmkVP node. 
 https is not supported out of the box. Consider enabling a simple nginx https proxy in produciton
@@ -31,7 +31,6 @@ llLinkMessage "channels" if used
 #define chanNumResponse 8675310
 
 //!!!!! END SET VALUES
-
 
 /*   
 
@@ -70,7 +69,6 @@ ToDo:
 //Debugging
 #define debugMe(msg)\
   llOwnerSay(msg);
-
 
 //Method Defines for easier HTTPRequest logic:
 #define NEW 1

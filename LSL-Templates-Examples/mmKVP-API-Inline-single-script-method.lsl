@@ -10,7 +10,7 @@ Consider this a template to build a functional script from.
 // !!!!!! Required Settings
 
 //apiKey MUST match what is .env on your mmKVP node
-#define apiKey ThisIsMyAPIKey 
+#define apiKey "ThisIsMyAPIKey" 
 /*
  The URL of your mmkVP node. 
  https is not supported out of the box. Consider enabling a simple nginx https proxy in produciton
