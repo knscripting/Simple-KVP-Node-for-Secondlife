@@ -138,7 +138,7 @@ INFO   95%      179 ms
 INFO   99%      215 ms
 INFO  100%      1173 ms (longest request)
 ```
-A2: Really though, I'm not sure. In my testing I will hit the 25 requests in 20 seconds llHttpRequest before the response time climbed over 22ms. See the Throttles Section here: https://wiki.secondlife.com/wiki/LlHTTPRequest If your project requires agressive read/write/query you'll need to use more in-world datamanagement and use mmKVP for initialization and perodic (once a minute or event driven) backups. Rule of thumb: In-world will always be faster than out-world and most imporantly, you have to manage the calculated throttles mentioned above. Plan your project's read/writes/storage with those in-game limitations in mind.
+A2: Really though, I'm not sure. In my testing I will hit the 25 requests in 20 seconds llHttpRequest before the response time climbed over 22ms. See the Throttles Section here: https://wiki.secondlife.com/wiki/LlHTTPRequest If your project requires agressive read/write/query you'll need to use more in-world data management and use mmKVP for initialization and periodic (once a minute or event driven) backups. Rule of thumb: In-world will always be faster than out-world and most imporantly, you have to manage the calculated throttles mentioned above. Plan your project's read/writes/storage with those in-game limitations in mind.
 
 ## Thanks
 Special thanks to the initial examples in this repository for getting me started:
