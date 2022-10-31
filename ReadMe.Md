@@ -19,8 +19,6 @@ Any use in production on the host/node side, requires adjustments to the .env, d
 
 Data is stored by a "key" which is some unique string and a "value" which is also a string. This API allows an LSL script to  GET, PUT, POST, DELETE a web query to the database, adding, changing, deleting KVP records. Data is stored in a MongoDB database, advanced querying is done in LSL, more talented coders than I can certainly improve on the API to suit more complicated structures. If you do, please consider sharing back improvements to this basic resorce.
 
-See the internal documentation for more details. 
-
 ## Notes on hosting:
 
 For development and testing I recommend using the npm method and your system at home. (see recommended tools)
@@ -28,6 +26,8 @@ For production I am using Amazon AWS (ec2 free teir) for the node, nginx to hand
 the database is mongodb.com free tier. So far my hosting expenses are $Zero. It'll be a while before I have any project that's going to tax these basic systems. I've tested to setup on old junky machines, RaspberriPi (you can't run mongodb 5+ on a rPI, that configuration requires an external mongoDB instance), AWS, virtual machine hosts. Any machine that can handle npm and docker-compose should work. 
 
 Wrapping the node in SSL and setting up nginx reverse proxy is not difficult and I recommend that setup in production.  Porting this node into a serverless structure is in the future. 
+
+*If you have no idea what any of that means, see the FAQ below*
 
 ## Installation:
 
@@ -97,6 +97,9 @@ I accomplish this with an nginx+certbot reverse proxy.
 
 CORS is also enabled in the hosting code to provide a simple Source header check which can further limit the exposer of your API.
 
+# Q: Hosting looks complicated, do it for me?
+A: I'll consider it, lets talk. Contact me in-world. 
+
 # Q: What's this #define stuff in your LSL?
 A: #defines are lsl-preprocessor macros that get hard-coded into your script at compile time. Basically they are a script memory saving tool. I've tried to follow this guide in my LSL scripts, you should too:  https://github.com/JasXSL/SL-XOBJ/wiki/LSL-Best-Practices
 
@@ -113,8 +116,9 @@ A: You can't easilly at the moment, no server-side query structure, but you can 
 A: mmValue is stored as a string. Anything you can store as a string you can use. ParsedList, JSON, base64 strings. Whatever you need.
 
 # Q: Just how large can this scale up to?
-A1: Depends on your hosting setup, using two or three dockerized nodes, nginx-reverse proxy round robinging, and a clustered mongoDB even at the free tier levels for all... Pretty damn large. I would be confident in a thousands of users with moderatly heavy read-writes. 
-A2: Really I'm not sure, but in my testing I will hit the 25 requests in 20 seconds llHttpRequest before the response time climbed over 22ms. If your project is expecting to see agressive read/write/query you'll likely need to use more in-world datamanagement and use mmKVP for initialization and perodic (once a minute or event driven) backups. Rule of thumb: In-world will always be faster than out-world and most imporantly, each sim has a cap on the number of httprequests that can happen at any time. Plan your project's read/writes/storage with those in-game limitations in mind.
+A1: Depends on your hosting setup, using two or three dockerized nodes, nginx-reverse proxy round robining, and a clustered mongoDB even at the free tier levels for all... I would be confident in a thousands of users with busy read-writes. 
+A1.1: A single node, single DB should be able to handle 100-ish read/writes a minute.  
+A2: Really though, I'm not sure. In my testing I will hit the 25 requests in 20 seconds llHttpRequest before the response time climbed over 22ms. See the Throttles Section here: https://wiki.secondlife.com/wiki/LlHTTPRequest If your project requires agressive read/write/query you'll need to use more in-world datamanagement and use mmKVP for initialization and perodic (once a minute or event driven) backups. Rule of thumb: In-world will always be faster than out-world and most imporantly, you have to manage the calculated throttles mentioned above. Plan your project's read/writes/storage with those in-game limitations in mind.
 
 ## Thanks
 Special thanks to the initial examples in this repository for getting me started:
