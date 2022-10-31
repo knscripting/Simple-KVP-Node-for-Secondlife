@@ -117,7 +117,27 @@ A: mmValue is stored as a string. Anything you can store as a string you can use
 
 # Q: Just how large can this scale up to?
 A1: Depends on your hosting setup, using two or three dockerized nodes, nginx-reverse proxy round robining, and a clustered mongoDB even at the free tier levels for all... I would be confident in a thousands of users with busy read-writes. 
-A1.1: A single node, single DB should be able to handle 100-ish read/writes a minute.  
+A1.1: If you use nginx as a frontend besure to read up worker_connections (default is 768) 
+A1.2: A single node, single DB should be able to handle 2000-ish read/writes a minute. Default installs all around with no tweaks on Free Tier Amazon EC2 and MongoDB can maintain 160ms response at 32 Writes per second of a string 1024 characters long.
+A1.3: With worker_connections at 2048 on Free Tier 1CPU 1Gig servers a loadtest returned:
+```
+INFO Max time (s):        60
+INFO Concurrency level:   8
+INFO Agent:               none
+INFO
+INFO Completed requests:  719
+INFO Total errors:        0
+INFO Total time:          60.065037943 s
+INFO Requests per second: 12
+INFO Mean latency:        168.5 ms
+INFO
+INFO Percentage of the requests served within a certain time
+INFO   50%      165 ms
+INFO   90%      174 ms
+INFO   95%      179 ms
+INFO   99%      215 ms
+INFO  100%      1173 ms (longest request)
+```
 A2: Really though, I'm not sure. In my testing I will hit the 25 requests in 20 seconds llHttpRequest before the response time climbed over 22ms. See the Throttles Section here: https://wiki.secondlife.com/wiki/LlHTTPRequest If your project requires agressive read/write/query you'll need to use more in-world datamanagement and use mmKVP for initialization and perodic (once a minute or event driven) backups. Rule of thumb: In-world will always be faster than out-world and most imporantly, you have to manage the calculated throttles mentioned above. Plan your project's read/writes/storage with those in-game limitations in mind.
 
 ## Thanks
