@@ -43,7 +43,10 @@ router.post('/mmRead', async (req, res) => {
         var id = {mmKey: req.body.mmKey};
         console.log("Reading:",id);
         const data = await Model.findOne(id);
-        res.json(data)
+        //res.json(data)
+        const sendMe = {mmValue: result.mmValue};
+        res.send(sendMe);
+        //console.log("Writing:", id );
     }
     catch (error) {
         console.log("No Key");
