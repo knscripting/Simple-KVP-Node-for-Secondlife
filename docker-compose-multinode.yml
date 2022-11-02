@@ -2,7 +2,7 @@ version: '2'
 
 # Define the services/containers to be run
 services:
-  mmkvp: #name of your service
+  mmkvp1: #name of your service
     build:
       context: .
       dockerfile: Dockerfile
@@ -15,7 +15,7 @@ services:
     restart: always
     command: npm start
 
-  mmkvp: #name of your service
+  mmkvp2: #name of your service
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,7 +28,7 @@ services:
     restart: always
     command: npm start
 
-  mmkvp: #name of your service
+  mmkvp3: #name of your service
     build:
       context: .
       dockerfile: Dockerfile
