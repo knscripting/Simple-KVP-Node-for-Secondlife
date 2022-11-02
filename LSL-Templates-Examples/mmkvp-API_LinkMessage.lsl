@@ -76,10 +76,10 @@ ToDo:
 #define READ 3
 
 //Macros for headers based on C.R.U.D. options
-#define headerPUT [HTTP_METHOD,"PUT",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
-#define headerPOST [HTTP_METHOD,"POST",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
-#define headerGET [HTTP_METHOD,"GET",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
-#define headerDELETE [HTTP_METHOD,"DELETE",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
+#define headerPUT [HTTP_BODY_MAXLENGTH, 16384, HTTP_METHOD,"PUT",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
+#define headerPOST [HTTP_BODY_MAXLENGTH, 16384, HTTP_METHOD,"POST",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
+#define headerGET [HTTP_BODY_MAXLENGTH, 16384, HTTP_METHOD,"GET",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
+#define headerDELETE [HTTP_BODY_MAXLENGTH, 16384, HTTP_METHOD,"DELETE",HTTP_MIMETYPE, "application/x-www-form-urlencoded"]
 
 //Macro Function to parse mmValue from response
 #define RETURNmmValue result=llJsonGetValue(body,["mmValue"])
