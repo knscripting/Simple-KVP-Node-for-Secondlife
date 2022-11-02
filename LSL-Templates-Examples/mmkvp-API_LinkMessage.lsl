@@ -86,10 +86,12 @@ ToDo:
 
 //Macro Function that generates and sends the http_request for a WRITE
 #define mmWrite(mmKey, mmValue) \
+    methodFlag=WRITE; \
     http_request_id=llHTTPRequest(nodeHOST+"mmWrite/",headerPUT,"mmKey="+mmKey+"&mmValue="+mmValue+"&apiKey="+apiKey) 
 
-//Macro Function that generates and sends the http_request for a READ 
+//Macro Function that generates and sends the http_request for a READ
 #define mmRead(mmKey) \
+    methodFlag=READ ;\
     http_request_id=llHTTPRequest(nodeHOST+"mmRead/",headerPOST,"mmKey="+mmKey+"&apiKey="+apiKey)
 
 key http_request_id;
@@ -136,8 +138,7 @@ default
             string result = "" ;  //What body recorded into
             //debugMe("API - body/lenth: "+body + " "+(string)llStringLength(body)+ "\nstatus: "+(string)status);
             
-            if (status == 200)
-            {
+            if (status == 200){
                 //If the body is a Json of no length, re-write and return NULL
                 if (llStringLength(body) <= 4 ) { 
                 body = "{\"mmValue\": \"NULL\"}" ;
@@ -161,8 +162,7 @@ default
                     }
                 }
             } //200
-            else if (status >= 300 )
-            {
+            else if (status >= 300 ){
                 result = "ERROR: "+(string)status ;   
             } //300
         
