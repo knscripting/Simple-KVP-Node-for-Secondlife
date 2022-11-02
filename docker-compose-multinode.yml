@@ -1,0 +1,42 @@
+version: '2'
+
+# Define the services/containers to be run
+services:
+  mmkvp: #name of your service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080" #specify ports forwarding
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: mmkvp-node1
+    restart: always
+    command: npm start
+
+  mmkvp: #name of your service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8080" #specify ports forwarding
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: mmkvp-node2
+    restart: always
+    command: npm start
+
+  mmkvp: #name of your service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8080" #specify ports forwarding
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    container_name: mmkvp-node3
+    restart: always
+    command: npm start
