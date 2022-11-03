@@ -5,4 +5,7 @@
 - llLinkMessage protections beyond channel number
 - Demonstrate reading and buffering of data with the new KVP on Object
 - *done* mmRead returns only mmValue and not the meta-data
-
+- lsl figure out how to handle httpRequest keys
+- lsl check for overflows 25 reqs in 20 seconds
+- lsl #ifndef clean up the #defines
+- lsl make mmWrite and mmRead a single function with callback

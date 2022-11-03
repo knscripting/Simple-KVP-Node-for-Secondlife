@@ -7,13 +7,13 @@ mmKVP offers a way to store data externally to SL in a Key-Value-Pair API via ht
 
 Secondlife has an issue with persistent data storage. Examples would be, configuration settings for a user for a device or you sell. Visitor logs that can accomate thousands and thousands of people. Persistant storage for huds (Hit Points, Gold, etc). Grid-wide waypoints, tournament score cards and leader boards, scavenger hunts. Basically, any sort of information you don't want lost to deleting an object, resetting a script, or making a change to a data structure. 
 
-In-world your .lsl script makes and HTTP call via the mmKVP api script to the external mmKVP node, that node queries a mongoDB database, and your saved data is returned as a string. It's fast, it can handle large data loads, and IMHO is easier to setup and maintain than php, mySQL databases, GoogleSheets data storage, in-world servers. And if your project is larger than your own parcel, Second-lifes experience framework. 
+In-world your .lsl script makes and HTTP call via the mmKVP api script to the external mmKVP node, that node queries a mongoDB database, and your saved data is returned as a string. It's fast, it can handle large data loads, and IMHO is easier to setup and maintain than php, mySQL databases, GoogleSheets data storage, in-world servers, and if your project is larger than your parcel's, Second-lifes experience framework. 
 
 See LSL-Templates-Examples for how the API works in-world. The rest is up to you and where and how you choose to host the node.
 
 ## How to get started:
 
-This requires some know how on basic server hosting, firewalls, docker, .lsl scripting, and a little understand on what node.js/express/mongoose is. (It's a javascript type web server that is too smart for it's own good...)
+This requires some know how on basic server hosting, firewalls, docker, .lsl scripting, and a little understand on what node.js/express/mongoose is. (It's a javascript type web server that is too smart for its own good...)
 
 Any use in production on the host/node side, requires adjustments to the .env, docker-compose.yml, for connection strings, shared-secrets, and passwords.
 
@@ -142,6 +142,8 @@ A2: Really though, I'm not sure. In my testing I will hit the 25 requests in 20 
 
 ## Thanks
 Special thanks to the initial examples in this repository for getting me started:
+
+https://github.com/JasXSL 
 
 https://github.com/bhanushalimahesh3/node-rest-api-jwt.git
 
