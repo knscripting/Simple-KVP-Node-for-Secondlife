@@ -1,17 +1,49 @@
 /*   
 mmKVP API v01
 This is the Initial release for the Simple KVP Node for Secondlife
-The API listens on the defined channels below for a unique key, and a value
+
+This script can be used in different ways. As an single script in your project,
+    A stand alone script in your object that responds to link_messages or listens providing
+    data to the other scripts in your linkset or region.
+
+    --Coming soon, when KVP on LinkSet is fully available in the grid, I'll write an example
+    to pass information via that system. 
+
+    Note: HTTP Requests are "asynchronous". Meaning if we make Three reaquests: 1, 2, 3
+        They could be returned in a different order  2, 1, 3... 
+        Keep this in mind when making link_message or listen calls to this script. 
+        -See Examples below.
+
+    Note: Only use ONE "include" of this API in your object otherwise weird issues.
+
+    Note: debugMe is used liberally in the script to aid in debugging. When you release the API
+        I recommend you only allow this script to kick back the more serious errors.
+        -Node not online, Error 500s, 
+        Ideally your calling main script handles any reporting to the user.
+
+The API runs inline or listens on the defined channels below for a unique key, and a value
 to read/write to an external node.js mongoDB store.
 At this stage security is minimal and requires external configuration of a server/host of your choosing
-see gitHub for options
+see gitHub for optoins
 
 https://github.com/knscripting/Simple-KVP-Node-for-Secondlife
 2022-11-03 Kehf Nelson
+
+Known Issues:
+-Keep your mmValue size in mind. http requests have a max size of 16K. This is an LSL/Mono thing and can't be increased
+-Keep your API Key secure to you.
+-ALWAYS set your API script to no modify. 
+-There's a hard limit to the number of requests you can make per user. 25 in 20 seconds. The API will try to mitigate this
+    But be aware and plan ahead.
+
+
 ToDo:
 -Delete.New,Patch method, do we really need it?
 -Retrieve MetaData?
 -Retrieve a list of *like keys or searchable mmValue?
+-KVP in linkset when available
+
+
 
 */
 
@@ -20,7 +52,7 @@ ToDo:
 //!!!!! Required Settings
 // http or https whatever you setup on your host
 
-//apiKey MUST match what is .env on your mmKVP node
+//apiKey MUST match what is set in .env on your mmKVP node
 
 #define apiKey "SET_THIS_TO_Your_Hosts_API_KEY"
 /*
@@ -31,16 +63,20 @@ Using amazons EC2 free tier to a mongodb.com free tier is surprisingly quick.
 
 #define nodeHOST "http://YOURHOST:8080/mmkvp/"
 
-/*
+/* !!!!! Keep this secret!
 Key Generator hash. 
 A Unique Key for the Database. I recommend something like:
-           (string)llGetOwner() + "#" + "Reference Type" + "#"ProjectName"
+           (string)llGetOwner() + "#" + "-Reference Type-" + "#"-ProjectName-"
            Ex:
            123-123-12312312312-1231231#Player#My_First_KVP_HUD
            or
            231.137-35132423423-1774564#Monster#My_First_KVP_HUD
            
-           That's completely optional and should be set to your needs
+           That's all up to you and should be set to your needs
+
+           !!!!! This api can retrieve ANY key in your DB. 
+                Keep the forumation of your keyhash just as
+                Secret as your API Key. 
 */
 #define myKeyHash (string)llGetOwner()+"-MyProjectName" 
 /*
@@ -92,7 +128,7 @@ integer resHandle is a flag passed to http_response on how to handle the expecte
     
 mmKey and mmValue are the key to read/write and the value to write or read.  
     mmKey may not be NULL. mmValue may be Null. 
-    !!!!! I won't waste script resources checking for that. 
+    !!!!! By default we won't check for that. 
 
 Ex: mmQuery(READ, READ, myKey, "" )   
     -- to perform a Read with default response handling
@@ -132,7 +168,7 @@ mmQuery(integer mmMethod, integer resHandle, string mmKey, string mmValue) {
 string myValue ; 
 string myKey ;
 
-///////////// Memory Management Helper Functions 
+///////////// Memory Management Helper Functions - Not Required
 #define memoryLimit(x) \
  llSetMemoryLimit( (integer)((float)llGetUsedMemory()*x) ) 
 
@@ -141,7 +177,15 @@ string myKey ;
 /////////////
 default
 {
-    //Process Requests that come in via a Listen
+    /* !!!!!
+
+    listen() link_message() touch_start() 
+    
+    Are included for demo and instructional purposes, they are situational to your requirements.
+
+    touch_start() is included for testing and demo purposes
+
+    //optional Process Requests that come in via a Listen
     listen (integer chan, string name, key id, string msg)
     { 
         //list msgData = llParseString2List(msg,["*"],[]);
@@ -149,7 +193,7 @@ default
         // arguments for mmQuery   
     }
 
-    //Process Requests that come in via link_message
+    //optional Process Requests that come in via link_message
     link_message(integer link, integer num, string msg, key id)
     {
         //list msgData = llParseString2List(msg,["*"],[]); 
@@ -157,16 +201,21 @@ default
         // arguments for mmQuery   
     }
 
+    // For Demo purposes
     touch_start(integer total_number)
     {
         //Simple Testing 
-        /debugMe("Trying to Query DB with-\nmmKey: "+myKey 
+        myValue = llGetUnixTime() ;
+        debugMe("Trying to Query DB with-\nmmKey: "+myKey 
                 + "\nmmValue: "+myValue);
         
         //mmQuery(WRITE, WRITE, myKey, myValue); 
         mmQuery( READ, READ, myKey, "");
     }
     
+    !!!!! 
+    */
+
     // !!!!! API Required
     http_response(key request_id, integer status, list metadata, string body)
     {   
@@ -218,7 +267,7 @@ default
             {
                 // !!!!! Do something, or not, if the key is not found
                 //No Key Found, create a record
-                debugMe("API - No Matching Key, Creating it");   
+                debugMe("API - No Matching Key, Creating it");   // Optional
                 mmQuery(WRITE, WRITE, myKey, "Init Value"); //Since there is no key, take the liberty of making one
                 llSleep(1.5); //Let's just sleep for good measure
             } // 500
@@ -247,14 +296,16 @@ default
         }//if (request_id == http_request_id)
     } // http_response()
     
+    //state_entry() is mostly optional.. 
     state_entry()
     {
-        myKey = myKeyHash; //Generate a default key for this Project
-        //myValue = (string)llGetUnixTime()
+        myKey = myKeyHash; //Optional - Can be Generate a default key for this Project
+
+        //Info
         debugMe("On touch I will Read - \nmmKey: "+myKey 
                 + "\nmmValue: "+myValue);
     
-        memoryStats() ;  //Displays memory usage.           
+        memoryStats() ;  // !!!!! Optional - Displays memory usage.           
    
     }
 }
