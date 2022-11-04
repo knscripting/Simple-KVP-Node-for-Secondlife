@@ -202,18 +202,18 @@ default
     /* 
         Here's an example of how to handle mmKVP requests via link_messages
 
-        Naturally if we are requestion via a link_message we'll assume you want to receive the result
-        via link_message.  see http_resonse()
+        If we are requesting via a link_message we'll assume you want to receive the result
+        via link_message.  see http_response()
         
         Using the link_message structure we'll break a request and track a response using the "key id" 
         and "integer num"
 
-        msg = mmKey $$ mmValue  The body of our request which we'll turn msg into a list removing $$
-        id = Method $$ ResHandler/CallBackChannel   Also a list removing $$
+        Expect msg = mmKey $$ mmValue  --The body of our request which we'll turn msg into a list removing $$
+        Expect id = Method $$ ResHandler/CallBackChannel   --Also a list removing $$
     */
     //link_message(integer link, integer num, string msg, key id)
     //{     
-        //if( num == chanNumRequest) { //Take all inbound requests on this channel
+        //if( num == chanNumRequest) { //Take all inbound requests on #define above
         //    
             //debugMe("API -Received from Link -" + 
             //    "\nLINK: "+(string)link +
@@ -221,7 +221,7 @@ default
             //    "\nKEY:  "+(string)id +
             //    "\nMSG:  "+(string)msg );
             
-            //  The imporant parts.  
+            //  !!!!! The important part.  
             //    We'll split the string into lists
             //    Then pass the the elements into mmQuery
                 
@@ -253,7 +253,7 @@ default
     http_response(key request_id, integer status, list metadata, string body)
     {   
         //debugMe("Queue Before: "+llDumpList2String(mmKVPQueue, "$") );
-        debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);  
+        //debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);  
 
         //Find the request_id match in mmKVPQueue
         integer idx = llListFindList(mmKVPQueue, [request_id]) ;
@@ -265,9 +265,10 @@ default
             mmKVPQueue = llDeleteSubList(mmKVPQueue, idx, idx+1 ) ; //Delete the matching key and flag from the mmKVPQueue list
             
             // If you are using the API in a link_message or listen scenario. Handling status errors should be moved outside of the API
+            // Report the error via resHandler and let those scripts figure it out.
             
-            //Inline single script example of Error Handling
-            if (status == 200){  //mmKVP returns status 200, that means the query "worked"
+            //Start handling responses by status.
+            if (status == 200){  //mmKVP returns status 200, that means the query "worked" or didn't throw an error
                 //If the body is a Json of no length, re-write and return NULL
                 if (llStringLength(body) <= 4 ) { 
                     body = "{\"mmValue\": \"NULL\"}" ;
@@ -289,8 +290,8 @@ default
                     }
                 } else if (resHandle >= chanNumResponse ) {  
                     /* !!!!!!
-                        Let's say any other resHandle greater than chanNumResponse is a "channel" to respond with
-                        Let the call script handle the output and potential errors, see ex. below                         
+                        Let's say any other resHandle greater than chanNumResponse is a "channel" to respond upon.
+                        Let the call script handle the output and potential errors.                       
                     */
                     RETURNmmValue ; //See #define above
                     llMessageLinked(LINK_SET, resHandle, result, (string)status);
@@ -304,8 +305,6 @@ default
                 script. 
                 !!!!!  
                 */
-                // !!!!! Do something with the returned result.
-                //debugMe("mmKVP Returned: "+result) ;
             } //200
             else if ( status >= 500)
             {
@@ -319,16 +318,16 @@ default
             } // 500
             else if (status >= 400)
             {
-               result = "ERROR: "+(string)status ;
-               // ex. llLinkMessage(LINK_SET, resHandle, "ERROR, 400", (string)status);
-               //debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);    
+                result = "ERROR: "+(string)status ;
+                // ex. llLinkMessage(LINK_SET, resHandle, "ERROR, 400", (string)status);
+                //debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);    
             } // 400
             else if (status >= 300 )
             {
                 result = "ERROR: "+(string)status ;
                 // ex. llLinkMessage(LINK_SET, resHandle, "ERROR, 300", (string)status);
             } //300            
-        }//if (request_id == http_request_id)
+        }//if (idx >= 0)
     } // http_response()
    
     //state_entry() is mostly optional.. 
