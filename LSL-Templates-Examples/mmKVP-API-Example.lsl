@@ -84,9 +84,14 @@ llLinkMessage or Listen"channels" if used
 !!!!! change these and keep them secret, currently the only security in place to prevent
 "unauthorized" access to the contents of your DB. 
 */
-#define chanNumRequest 8675309
-#define chanNumResponse 8675310
+//We'll listen for requests from other scripts via link_message on chanNumRequest
+#define chanNumRequest 8675309 
 
+//We'll respond to those reqests on a channel GREATER than chanNumResponse 
+//   When sending a request especially from multiple scripts in your linkset
+//   add a value to chanNumResponse 
+//   ex   num = chanNumResponse + llGetLinkNumber() + some_other_unique_integer_assigned_to_each_script
+#define chanNumResponse 8675310 
 //!!!!! END SET VALUES
 
 
@@ -192,14 +197,45 @@ default
         // !!!!! You need to figure out how to pass the required
         // arguments for mmQuery   
     }
+    */
 
-    //optional Process Requests that come in via link_message
-    link_message(integer link, integer num, string msg, key id)
-    {
-        //list msgData = llParseString2List(msg,["*"],[]); 
-        // !!!!! You need to figure out how to pass the required
-        // arguments for mmQuery   
-    }
+    /* 
+        Here's an example of how to handle mmKVP requests via link_messages
+
+        Naturally if we are requestion via a link_message we'll assume you want to receive the result
+        via link_message.  see http_resonse()
+        
+        Using the link_message structure we'll break a request and track a response using the "key id" 
+        and "integer num"
+
+        msg = mmKey $$ mmValue  The body of our request which we'll turn msg into a list removing $$
+        id = Method $$ ResHandler/CallBackChannel   Also a list removing $$
+    */
+    //link_message(integer link, integer num, string msg, key id)
+    //{     
+        //if( num == chanNumRequest) { //Take all inbound requests on this channel
+        //    
+            //debugMe("API -Received from Link -" + 
+            //    "\nLINK: "+(string)link +
+            //    "\nNUM:  "+(string)num  +
+            //    "\nKEY:  "+(string)id +
+            //    "\nMSG:  "+(string)msg );
+            
+            //  The imporant parts.  
+            //    We'll split the string into lists
+            //    Then pass the the elements into mmQuery
+                
+            //list mmKeyValue = llParseString2List( msg, ["$$"], [] ) ;
+            //list mmCallResMethod = llParseString2List( id, ["$$"], [] ); 
+            
+            //mmQuery(
+            //    llList2Integer( mmCallResMethod, 0) ,
+            //    llList2Integer( mmCallResMethod, 1) ,
+            //    llList2String(mmKeyValue, 0) ,
+            //    llList2String(mmKeyValue, 1) );
+            
+        //} //chanNumRequest             
+    //}//link_message
 
     // For Demo purposes
     touch_start(integer total_number)
@@ -211,16 +247,13 @@ default
         
         //mmQuery(WRITE, WRITE, myKey, myValue); 
         mmQuery( READ, READ, myKey, "");
-    }
+    } //Touch
     
-    !!!!! 
-    */
-
     // !!!!! API Required
     http_response(key request_id, integer status, list metadata, string body)
     {   
         //debugMe("Queue Before: "+llDumpList2String(mmKVPQueue, "$") );
-        //debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);  
+        debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);  
 
         //Find the request_id match in mmKVPQueue
         integer idx = llListFindList(mmKVPQueue, [request_id]) ;
@@ -231,6 +264,9 @@ default
             string result = "" ;  //What body is recorded into
             mmKVPQueue = llDeleteSubList(mmKVPQueue, idx, idx+1 ) ; //Delete the matching key and flag from the mmKVPQueue list
             
+            // If you are using the API in a link_message or listen scenario. Handling status errors should be moved outside of the API
+            
+            //Inline single script example of Error Handling
             if (status == 200){  //mmKVP returns status 200, that means the query "worked"
                 //If the body is a Json of no length, re-write and return NULL
                 if (llStringLength(body) <= 4 ) { 
@@ -251,8 +287,15 @@ default
                     }else {
                         RETURNmmValue ; //See #define above
                     }
+                } else if (resHandle >= chanNumResponse ) {  
+                    /* !!!!!!
+                        Let's say any other resHandle greater than chanNumResponse is a "channel" to respond with
+                        Let the call script handle the output and potential errors, see ex. below                         
+                    */
+                    RETURNmmValue ; //See #define above
+                    llMessageLinked(LINK_SET, resHandle, result, (string)status);
                 } else {
-                    debugMe("ERROR: Unhandled Response Flag: "+(string)resHandle); // READ
+                    result = "ERROR, Bad resHandle" ; //Catchall
                 }
                 /*
                 !!!!!
@@ -261,51 +304,42 @@ default
                 script. 
                 !!!!!  
                 */
-
+                // !!!!! Do something with the returned result.
+                //debugMe("mmKVP Returned: "+result) ;
             } //200
             else if ( status >= 500)
             {
                 // !!!!! Do something, or not, if the key is not found
                 //No Key Found, create a record
-                debugMe("API - No Matching Key, Creating it");   // Optional
-                mmQuery(WRITE, WRITE, myKey, "Init Value"); //Since there is no key, take the liberty of making one
-                llSleep(1.5); //Let's just sleep for good measure
+                //debugMe("API - No Matching Key, Creating it");   // Optional
+                //mmQuery(WRITE, WRITE, myKey, "Init Value"); //Since there is no key, take the liberty of making one
+                //llSleep(1.5); //Let's just sleep for good measure
+                
+                // ex. llLinkMessage(LINK_SET, resHandle, "ERROR, 500", (string)status);    
             } // 500
             else if (status >= 400)
             {
                result = "ERROR: "+(string)status ;
+               // ex. llLinkMessage(LINK_SET, resHandle, "ERROR, 400", (string)status);
                //debugMe("API - length: "+(string)llStringLength(body)+ "\nstatus: "+(string)status +"\nbody: "+body);    
             } // 400
             else if (status >= 300 )
             {
-                result = "ERROR: "+(string)status ;   
-            } //300
-        
-
-            // !!!!! Do something with the returned result.
-            debugMe("mmKVP Returned: "+result) ;
-            /*
-            !!!!! You would send your linkmessage or llRegionSayTo...  Whatever return method
-                  Matches your API Input
-                
-                ex:  llMessageLinked(LINK_THIS, chanNumResponse, result, "");
-                ex:  llRegionSayTo(chanNumResponse, result);
-
-            debugMe("Queue After:" + llDumpList2String(mmKVPQueue, "$") );
-            */
+                result = "ERROR: "+(string)status ;
+                // ex. llLinkMessage(LINK_SET, resHandle, "ERROR, 300", (string)status);
+            } //300            
         }//if (request_id == http_request_id)
     } // http_response()
-    
+   
     //state_entry() is mostly optional.. 
     state_entry()
     {
         myKey = myKeyHash; //Optional - Can be Generate a default key for this Project
 
-        //Info
         debugMe("On touch I will Read - \nmmKey: "+myKey 
                 + "\nmmValue: "+myValue);
     
         memoryStats() ;  // !!!!! Optional - Displays memory usage.           
    
-    }
-}
+    } //state_entry
+} //Default
