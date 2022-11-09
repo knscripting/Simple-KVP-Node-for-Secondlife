@@ -29,7 +29,7 @@ router.put('/mmWrite', async (req, res) => {
         )
         const sendMe = {mmValue: result.mmValue};
         res.send(sendMe);
-        console.log("User:",req.headers.mmOwnerName, " Writing:", id );
+        console.log("User:",req.headers['x-secondlife-owner-name'], " Writing:", id );
     }
     catch (error) {
         res.status(500).json({ status: "ERROR", message: error.message })
@@ -41,7 +41,7 @@ router.put('/mmWrite', async (req, res) => {
 router.post('/mmRead', async (req, res) => {
     try {
         var id = {mmKey: req.body.mmKey};
-        console.log("User:",req.headers.mmOwnerName, " Reading:",id);
+        console.log("User:",req.headers['x-secondlife-owner-name'], " Reading:",id);
         const result = await Model.findOne(id);
         //res.json(data)
         const sendMe = {mmValue: result.mmValue};
@@ -88,7 +88,7 @@ router.post('/mmRegex', async (req, res) => {
     try {
         const map = new Map([[ req.body.mmField , new RegExp(req.body.mmRegex,req.body.mmRegexOp)]]);
         const query = Object.fromEntries(map);
-        console.log("User:",req.headers.mmOwnerName, " RegEx: ",query);
+        console.log("User:",req.headers['x-secondlife-owner-name'], " RegEx: ",query);
         const result = await Model.find( query).select('mmKey');
         res.send(result);
     }
