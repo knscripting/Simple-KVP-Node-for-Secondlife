@@ -29,7 +29,7 @@ router.put('/mmWrite', async (req, res) => {
         )
         const sendMe = {mmValue: result.mmValue};
         res.send(sendMe);
-        console.log("Writing:", id );
+        console.log("User:",req.header.mmOwnerName, " Writing:", id );
     }
     catch (error) {
         res.status(500).json({ status: "ERROR", message: error.message })
@@ -41,7 +41,7 @@ router.put('/mmWrite', async (req, res) => {
 router.post('/mmRead', async (req, res) => {
     try {
         var id = {mmKey: req.body.mmKey};
-        console.log("Reading:",id);
+        console.log("User:",req.header.mmOwnerName, " Reading:",id);
         const result = await Model.findOne(id);
         //res.json(data)
         const sendMe = {mmValue: result.mmValue};
@@ -82,19 +82,21 @@ router.post('/mmDelete', async (req, res) => {
     }
 })
 
-/* No Need for this Method at this time
-//Get all Method
-router.get('/getAll', async (req, res) => {
+
+//Get Keys by RegEx
+router.post('/mmRegex', async (req, res) => {
     try {
-        const data = await Model.find();
-        res.json(data)
+        const map = new Map([[ req.body.mmField , new RegExp(req.body.mmRegex,req.body.mmRegexOp)]]);
+        const query = Object.fromEntries(map);
+        console.log("User:",req.header.mmOwnerName, " RegEx: ",query);
+        const result = await Model.find( query).select('mmKey');
+        res.send(result);
     }
     catch (error) {
+        console.log("No Key");
         res.status(500).json({ status: "failed", message: error.message })
     }
 })
-
-*/
 
 module.exports = router;
 

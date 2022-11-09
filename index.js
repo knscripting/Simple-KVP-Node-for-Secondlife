@@ -20,7 +20,7 @@ database.once('conencted', () => {
 const app = express();
 app.use(cors())
 app.use(express.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
 
 //API Validator
 const apiKeyValidate =function (req, res, next) {
