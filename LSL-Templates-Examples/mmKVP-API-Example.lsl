@@ -237,7 +237,7 @@ default
         //} //chanNumRequest             
     //}//link_message
 
-    // For Demo purposes
+    // !!!! For Demo purposes
     touch_start(integer total_number)
     {
         //Simple Testing 
@@ -333,12 +333,12 @@ default
     //state_entry() is mostly optional.. 
     state_entry()
     {
-        myKey = myKeyHash; //Optional - Can be Generate a default key for this Project
+        //myKey = myKeyHash; //Optional - Can be Generate a default key for this Project
 
-        debugMe("On touch I will Read - \nmmKey: "+myKey 
-                + "\nmmValue: "+myValue);
+        //debugMe("On touch I will Read - \nmmKey: "+myKey 
+        //        + "\nmmValue: "+myValue);
     
-        memoryStats() ;  // !!!!! Optional - Displays memory usage.           
+        //memoryStats() ;  // !!!!! Optional - Displays memory usage.           
    
     } //state_entry
 } //Default

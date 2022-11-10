@@ -1,11 +1,11 @@
 
-- lsl Scripts need a method for async httpRequest handling.  
-- More Advanced DB Query tools. 
 - API locks on .lsl scripts to not function if script has the wrong permissions
-- llLinkMessage protections beyond channel number
 - Demonstrate reading and buffering of data with the new KVP on Object
-- *done* mmRead returns only mmValue and not the meta-data
-- lsl figure out how to handle httpRequest keys
-- lsl check for overflows 25 reqs in 20 seconds
 - lsl #ifndef clean up the #defines
-- lsl make mmWrite and mmRead a single function with callback
+- *Partial* lsl check for overflows 25 reqs in 20 seconds
+- *done* mmQuery lsl make mmWrite and mmRead a single function with callback
+- *done* mmRead returns only mmValue and not the meta-data
+- *done* lsl figure out how to handle httpRequest keys
+- *done* lsl Scripts need a method for async httpRequest handling  
+- *done* More Advanced DB Query tools. mmRegex is tested but is dangerous, Use at your own risk!
+- *done* llLinkMessage protections beyond channel number
