@@ -109,8 +109,36 @@ A: Make sure the lsl-preprocessor is enabled. Beyond that contact me.
 # Q: If my project has several different "tables" users, objects, scores for example. Do I need Three nodes?** 
  A: One node and db will work just fine, MongoDB is essentially data agnostic by design, you can put any sort of fields in any order without the need to refresh and update older records. mmKVP only really cares about the KEY *mmKey* you create so the API can find the VALUE *mmValue* . In short, your .LSL needs to pay attention to the KEY. And just figure out how you want to handle the returned string for you Value.
 
- # Q: I need a more advanced query, how can I get something like, "The top 10 scores" out of the system?
-A: You can't easilly at the moment, no server-side query structure, but you can work around this issue, this functionality is on my todo and should be implemented soon. As a thought-experiment consider a work around: If you are keeping track of a golf tournament. You can have a mmKey of, "MyGolfCourseBest10Scores" with a mmValue of a strided list with $ as separater: "playerUuid$Score" that list could be 10 entries long or however big. When a score is turned in your scoreboard queries the current "MyGolfCourseBest10Scores", checks if the submitted score makes the cut, if so, adjust the list, re-sort it, and mmWrite the result. The players actual game can also be recorded in the same strided list with something like: mmKey=playerUUID-myGolfCourse mmValue=roundScore$72$hole1$3$hole2$1$hole4$6... etc etc 
+# Q: I need a more advanced query, how can I get something like, "The top 10 scores" out of the system?
+A: Regex queries are supported. In your POST body you need to specify:
+    mmField: The document key you wish to query ex, mmKey
+    mmRegex: The regular Expression or string you want to search for ex, FINDME_ (find keys with "FINDME_" in them)
+    mmKey: Not really used
+    mmValue: Valid JSON of document keys you want returned. ex: {"_id":0, "mmKey":1, "mmValue":1} 
+    mmPage: Results are paginated by default, return this page ex, 1
+    mmLimit: limit each page to this number of documents ex, 15
+
+    A valid query returns a json Array
+    If I want page 1 with limit 1 I would get something like:
+
+    [
+    {
+        "query": [
+            {
+                "count": 55
+            }
+        ],
+        "docs": [
+            {
+                "mmKey": "FINDME_4227996",
+                "mmValue": "thisvalue"
+            }
+        ]
+    }
+]
+
+From that you'll need to calucate the number of calls to make, pages and limits. 
+
 
 # Q: Do I have to use a parsed list for mmValue, can I use JSON or some other data type?
 A: mmValue is stored as a string. Anything you can store as a string you can use. ParsedList, JSON, base64 strings. Whatever you need.

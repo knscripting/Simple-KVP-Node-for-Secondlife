@@ -3,7 +3,6 @@ const express = require('express');
 const Model = require('../models/model');
 const router = express.Router();
 
-
 /*
 Upsert is enabled, if record doesn't exist, create it
 We record the SL header information as it could be 
@@ -35,7 +34,6 @@ router.put('/mmWrite', async (req, res) => {
         res.status(500).json({ status: "ERROR", message: error.message })
     }
 })
-
 
 //Get by ID Method
 router.post('/mmRead', async (req, res) => {
@@ -82,19 +80,54 @@ router.post('/mmDelete', async (req, res) => {
     }
 })
 
-
-//!!!! WiP, Use at your own risk... Get Keys by RegEx
+//mmValue needs to be a valid json
+// ex: {"_id":0, "mmKey":1, "mmValue":1}
+//mmField is they document key to regex against
+//mmRegex string to search for against mmField
+//mmPage mmLimit get this page limit return values
+//
 router.post('/mmRegex', async (req, res) => {
-    try {
-        const map = new Map([[ req.body.mmField , new RegExp(req.body.mmRegex,req.body.mmRegexOp)]]);
-        const query = Object.fromEntries(map);
-        console.log("User:",req.headers['x-secondlife-owner-name'], " RegEx: ",query);
-        const result = await Model.find( query).select('mmKey');
-        res.send(result);
+    if (req.body.mmValue) {
+        let jsonCheck;
+        try {
+            jsonCheck=JSON.parse(req.body.mmValue);
+        }
+        catch (error) {
+            res.status(500).json({ status: "failed", message: error.message }) 
+            return console.log("ERROR User:",req.headers['x-secondlife-owner-name']," Error invalid json in mmValue" , req.body.mmValue)
+        }
     }
-    catch (error) {
-        console.log("No Key");
-        res.status(500).json({ status: "failed", message: error.message })
+    const returnData=JSON.parse(req.body.mmValue)
+    const page = parseInt(req.body.mmPage)
+    const limit = parseInt(req.body.mmLimit)
+    const map = new Map([[ req.body.mmField , new RegExp(req.body.mmRegex,req.body.mmRegexOp)]])
+    const rquery = Object.fromEntries(map)
+
+    try {
+        const pageData = await Model.aggregate([
+            {
+              $facet: {
+                query: [
+                  { $match: rquery,},
+                  { $count: "count",},
+                ],
+        
+                docs: [
+                  {$match: rquery,},
+                  {$project: returnData, },
+                  {$skip: ((page -1) *limit),},
+                  {$limit: limit,},
+                ],
+              },
+            },
+          ])
+        console.log("User:",req.headers['x-secondlife-owner-name'], " RegEx: ",rquery);
+        //console.log("Ok RegEx: ",rquery );
+        res.send(pageData)
+    }
+    catch (error){
+        console.log("User:",req.headers['x-secondlife-owner-name'], "Error RegEx: ",rquery," msg: ", error.message);
+        res.status(500).json({ status: "failed", message: error.message })  
     }
 })
 
