@@ -100,7 +100,7 @@ router.post('/mmRegex', async (req, res) => {
     const returnData=JSON.parse(req.body.mmValue)
     const page = parseInt(req.body.mmPage)
     const limit = parseInt(req.body.mmLimit)
-    const map = new Map([[ req.body.mmField , new RegExp(req.body.mmRegex,req.body.mmRegexOp)]])
+    const map = new Map([[ req.body.mmKey , new RegExp(req.body.mmRegex,req.body.mmRegexOp)]])
     const rquery = Object.fromEntries(map)
 
     try {
